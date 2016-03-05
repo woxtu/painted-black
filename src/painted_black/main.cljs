@@ -6,8 +6,10 @@
             [clojurewerkz.balagan.core :as balagan]
             [dommy.core :as dommy]))
 
-(def settlement "疲れからか、不幸にも黒塗りの高級車に追突してしまう。
-後輩をかばいすべての責任を負った三浦に対し、車の主、暴力団員谷岡に言い渡された示談の条件とは・・・。")
+(def settlement
+  (str "疲れからか、不幸にも黒塗りの高級車に追突してしまう。"
+       "後輩をかばいすべての責任を負った三浦に対し、車の主、"
+       "暴力団員谷岡に言い渡された示談の条件とは・・・。"))
 
 (defn fetch [params xform]
   (http/jsonp "https://ja.wikipedia.org/w/api.php"
@@ -23,14 +25,14 @@
          (map #(nth (balagan/select % [:body :query :pages :* :revisions 0 :*]) 2))))
 
 (defn summary-of [source]
-  (some-> (re-find #"={2,} (?:あらすじ|ストーリー) ={2,}([\s\S]+?)==" source)
+  (some-> (re-find #"(?:あらすじ|ストーリー)\s?={2,}([\s\S]+?)==" source)
           second
           (string/replace #"\[\[(.+?)\|.+?\]\]" "$1")
           (string/replace #"\{\{.+\}\}|<.+/>" "")
           (string/replace #"'{2,}|\[\[|\]\]|#|\s" "")))
 
 (defn generate [source]
-  (let [result (re-find #"^.+?。.+?。.+?[ぁ-ん]、" source)]
+  (let [result (re-find #"^(?:.+?。){0,2}.+?[ぁ-ん]、" source)]
     (str result settlement)))
 
 (go
