@@ -26,4 +26,8 @@
   []
   (comp
     (speak)
-    (cljs :optimizations :advanced)))
+    (cljs :optimizations :advanced)
+    (with-post-wrap fileset
+      (dosh "mkdir" "-p" "gh-pages")
+      (doseq [file #{"target/main.js" "assets/index.html"}]
+        (dosh "cp" "-f" file "gh-pages")))))
